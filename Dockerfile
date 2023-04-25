@@ -41,6 +41,12 @@ COPY valhalla_code_overwrites/src/CMakeLists.txt valhalla/src/CMakeLists.txt
 RUN mkdir valhalla/build
 RUN cd valhalla/build; cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_SINGLE_FILES_WERROR=False
 # If this fails with `Killed signal terminated program cc1plus`, try increasing docker's memory to 16GB and disk to 200GB
+
+
+
+COPY valhalla_build_config /valhalla/build/
+
+
 RUN cd valhalla/build; make -j$(nproc)
 RUN cd valhalla/build; make install
 
@@ -49,8 +55,8 @@ RUN mkdir valhalla_tiles
 RUN cd valhalla_tiles; wget --no-check-certificate https://download.geofabrik.de/asia/south-korea-latest.osm.pbf -O south-korea.osm.pbf
 
 # Generate the config
-COPY valhalla_build_config ./valhalla_tiles/
-RUN cd valhalla_tiles; valhalla_build_config --mjolnir-tile-dir ${PWD}/valhalla_tiles --mjolnir-timezone ${PWD}/valhalla_tiles/timezones.sqlite --mjolnir-admin ${PWD}/valhalla_tiles/admins.sqlite --mjolnir-traffic-extract ${PWD}/traffic.tar > valhalla_raw.json
+# COPY valhalla_build_config ./valhalla_tiles/
+RUN cd valhalla_tiles; valhalla_build_config --mjolnir-tile-dir ${PWD}/valhalla_tiles --mjolnir-timezone ${PWD}/valhalla_tiles/timezones.sqlite --mjolnir-admin ${PWD}/valhalla_tiles/admins.sqlite --mjolnir-traffic-extract ${PWD}/traffic.tar > vallshalla_raw.json
 
 # Remove unused options to keep service output clean of errors
 RUN cd valhalla_tiles; sed -e '/elevation/d' -e '/tile_extract/d' valhalla_raw.json > valhalla.json
